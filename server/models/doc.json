@@ -1,0 +1,39 @@
+{
+  "_id": "5d16c37b2bc3e8796a674efe",
+  "name": "Wilmer",
+  "lastname": "Cantillo",
+  "ic": "1083029615",
+  "email": "will.canti2697@gmail.com",
+  "password": "123",
+  "department": "Magdalena",
+  "city": "Santa Marta",
+  "carsAmount": 2,
+  "cars": [
+    {
+      "plate": "WHI-263",
+      "brand": "BMW",
+      "model": "320",
+      "records": [
+        {
+          "latitud": 11.196294317448688,
+          "longitud": -74.2276668548584,
+          "date": "2019-03-17T06:54:15.000Z",
+          "rpm": "100"
+        }
+      ]
+    },
+    {
+      "plate": "CKN-363",
+      "brand": "Toyota",
+      "model": "120",
+      "records": [
+        {
+          "latitud": 11.196294317448688,
+          "longitud": -74.2276668548584,
+          "date": "2019-03-17T06:54:15.000Z",
+          "rpm": "200"
+        }
+      ]
+    }
+  ]
+}
