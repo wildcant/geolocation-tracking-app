@@ -8,6 +8,7 @@ const { Customer, Car, Record } = models;
  * @route Get all the of all docs/users from db
  */
 router.get("/", (req, res) => {
+  console.log("Request made to /");
   Customer.find()
     .then(doc => res.json(doc))
     .catch(err => console.log(err));
@@ -17,6 +18,7 @@ router.get("/", (req, res) => {
  * @route Get last position
  */
 router.post("/lastPos", (req, res) => {
+  console.log("Request made to /lastPos");
   const { email, plate } = req.body;
   const query = { email: email };
   let status = false;
@@ -39,6 +41,7 @@ router.post("/lastPos", (req, res) => {
  * @route Get all records of one car
  */
 router.post("/getAll", (req, res) => {
+  console.log("Request made to /getAll");
   const { email, plate } = req.body;
   const query = { email: email };
   let status = false;
@@ -61,6 +64,7 @@ router.post("/getAll", (req, res) => {
  * @route Add one record to records vector
  */
 router.post("/rec", (req, res) => {
+  console.log("Request made to /rec");
   const { email, plate, lat, lon, rpm } = req.body;
   var pos = new Record({
     latitud: lat,
