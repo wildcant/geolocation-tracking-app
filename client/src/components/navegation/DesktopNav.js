@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { Menu, Responsive, Segment } from "semantic-ui-react";
 const getWidth = () => {
@@ -9,12 +8,12 @@ const getWidth = () => {
 const styles = {
   navItem: {
     padding: "0 20px 5px 20px",
-    fontSize: "20px"
+    fontSize: "16px"
   },
   navBrand: {
     padding: "0 0 5px 0",
     margin: 0,
-    fontSize: "25px"
+    fontSize: "20px"
   }
 };
 class DesktopNav extends Component {

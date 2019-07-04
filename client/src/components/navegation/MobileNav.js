@@ -56,7 +56,6 @@ class MobileContainer extends Component {
           direction="bottom"
           inverted
           onHide={this.handleSidebarHide}
-          horizontal
           visible={sidebarOpened}
           style={{ overflow: "hidden" }}
         >

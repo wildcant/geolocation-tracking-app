@@ -15,7 +15,8 @@ router.get("/", (req, res) => {
 });
 
 /**
- * @route Get last position
+ * @route Get last position of only one car
+ * @params email, plate
  */
 router.post("/lastPos", (req, res) => {
   console.log("Request made to /lastPos");
@@ -39,10 +40,12 @@ router.post("/lastPos", (req, res) => {
 
 /**
  * @route Get all records of one car
+ * @params email, plate
  */
-router.post("/getAll", (req, res) => {
+router.post("/getRecords", (req, res) => {
   console.log("Request made to /getAll");
   const { email, plate } = req.body;
+  console.log(email);
   const query = { email: email };
   let status = false;
   Customer.findOne(query)
@@ -62,6 +65,7 @@ router.post("/getAll", (req, res) => {
 
 /**
  * @route Add one record to records vector
+ * @params email, plate, lat, lon, rpm 
  */
 router.post("/rec", (req, res) => {
   console.log("Request made to /rec");
@@ -80,6 +84,42 @@ router.post("/rec", (req, res) => {
       } else {
         res.json("not found");
       }
+    })
+    .catch(err => console.log(err));
+});
+
+/**
+ * @route Get all information from one user
+ * @params email
+ */
+router.post("/getUser", (req, res) => {
+  console.log("Request made to /getUser");
+  const { email } = req.body;
+  const query = { email: email };
+  Customer.findOne(query)
+    .then(doc => {
+      res.json(doc);
+    })
+    .catch(err => console.log(err));
+});
+
+/**
+ * @route Get last position of a bunch of cars
+ * @params email, plates
+ */
+router.post("/lastPosArr", (req, res) => {
+  console.log("Request made to /lastPosArr");
+  const { email, plates } = req.body;
+  const query = { email: email };
+  Customer.findOne(query)
+    .then(doc => {
+      let currentArr = [];
+      doc.cars.forEach(car => {
+        if (plates.includes(car.plate)) {
+          currentArr = [...currentArr, car.records[car.records.length - 1]];
+        }
+      });
+      res.json(currentArr);
     })
     .catch(err => console.log(err));
 });
