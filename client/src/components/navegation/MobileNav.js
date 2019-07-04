@@ -11,7 +11,6 @@ import {
 
 const getWidth = () => {
   const isSSR = typeof window === "undefined";
-  console.log(window.innerWidth);
   return isSSR ? Responsive.onlyTablet.minWidth : window.innerWidth;
 };
 const styles = {

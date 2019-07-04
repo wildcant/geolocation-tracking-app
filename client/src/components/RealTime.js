@@ -18,20 +18,21 @@ export default class RealTime extends Component {
   constructor() {
     super();
     this.state = {
-      currentPos: null,
       path: [],
       mess: "Loading",
       cars: [],
       plates: [],
+      records: [],
       userLoaded: false
     };
   }
   async componentDidMount() {
-    // setInterval(async () => {
-    //   await this.getLastPosition();
-    // }, 5000);
-    // await this.getLastPosition();
     await this.getUser();
+    setInterval(async () => {
+      await this.getRecords();
+    }, 2000);
+    // await this.getLastPosition();
+    // await this.getRecords();
   }
 
   getUser = async () => {
@@ -47,7 +48,7 @@ export default class RealTime extends Component {
       let cars = [];
       let plates = [];
       data.cars.forEach(car => {
-        cars = [...cars, { plate: car.plate, active: true }];
+        cars = [...cars, { plate: car.plate, active: true, records: [] }];
         plates = [...plates, car.plate];
       });
       this.setState({
@@ -68,33 +69,43 @@ export default class RealTime extends Component {
         plates = [...plates, car.plate];
       }
     });
+
     console.table(plates);
     // console.table(cars);
     this.setState({ cars, plates });
   };
-  getCurrentPosition = async () => {
-    const reqBody = { email: "will.canti2697@gmail.com", plate: "CKN-363" };
+
+  getRecords = async () => {
+    const { cars, plates } = this.state;
+    const reqBody = { email: "will.canti2697@gmail.com", plates: plates };
     const req = {
       method: "POST",
       body: JSON.stringify(reqBody),
       headers: { "Content-Type": "application/json" }
     };
     try {
-      const res = await fetch("http://192.168.1.8:5000/track/api/lastPos", req);
-      const coords = await res.json();
-      let actPos = { lat: coords.latitud, lng: coords.longitud };
-      this.setState({
-        currentPos: actPos,
-        path: [...this.state.path, actPos],
-        loaded: true
+      const res = await fetch(
+        "http://192.168.1.8:5000/track/api/lastPosArr",
+        req
+      );
+      const curPosArr = await res.json();
+      console.log(curPosArr);
+      curPosArr.map((curPos, i) => {
+        cars[i].records = [
+          ...cars[i].records,
+          { lat: curPos.latitud, lng: curPos.longitud }
+        ];
       });
+      console.log(cars);
+      this.setState({ cars, loaded:true });
     } catch (error) {
       this.setState({ mess: "Was not able to connect to the dataBase" });
       console.log(error.message);
     }
   };
+
   render() {
-    const { currentPos, path, loaded, mess, cars, userLoaded } = this.state;
+    const {  loaded, mess, cars, plates, userLoaded } = this.state;
     console.log(this.state.plates);
     return (
       <div>
@@ -115,7 +126,7 @@ export default class RealTime extends Component {
           <Grid.Column width={12}>
             {loaded ? (
               <Segment color="black" inverted style={styles.mapContainer}>
-                <RealMap currentPos={currentPos} path={path} />
+                <RealMap cars={cars} />
               </Segment>
             ) : (
               <div style={styles.text}>{mess}</div>

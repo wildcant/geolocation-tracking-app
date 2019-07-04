@@ -1,33 +1,29 @@
 import React, { Component } from "react";
-import { Checkbox, Grid } from "semantic-ui-react";
+import Map from "./common/Map";
 
-export default class Test extends Component {
+class App extends Component {
   constructor() {
     super();
-    this.state = {
-      cars: [
-        { plate: "WHI-263", active: false },
-        { plate: "CKN-363", active: false }
-      ]
-    };
   }
-  handleChange = (ind, e) => {
-    let cars = this.state.cars;
-    cars[ind].active = !cars[ind].active;
-    // console.table(cars);
-    this.setState({ cars });
-  };
+
   render() {
-    return this.state.cars.map((car, ind) => {
-      return (
-        <Grid.Column key={car.plate} width={12}>
-          <Checkbox
-            checked={car.active}
-            onChange={this.handleChange.bind(this, ind)}
-            label={<label style={{ color: "white" }}>{car.plate}</label>}
-          />
-        </Grid.Column>
-      );
-    });
+    return (
+      <Map
+        id="myMap"
+        options={{
+          center: { lat: 41.0082, lng: 28.9784 },
+          zoom: 8
+        }}
+        onMapLoad={map => {
+          var marker = new window.google.maps.Marker({
+            position: { lat: 41.0082, lng: 28.9784 },
+            map: map,
+            title: "Hello Istanbul!"
+          });
+        }}
+      />
+    );
   }
 }
+
+export default App;
