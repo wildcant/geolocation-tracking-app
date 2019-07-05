@@ -45,7 +45,7 @@ export default class RealTime extends Component {
       headers: { "Content-Type": "application/json" }
     };
     try {
-      let res = await fetch("http://192.168.1.8:5000/track/api/getUser", req);
+      let res = await fetch("http://3.83.109.19:5000/track/api/getUser", req);
       let data = await res.json();
       let cars = [];
       let plates = [];
@@ -79,7 +79,7 @@ export default class RealTime extends Component {
     };
     try {
       const res = await fetch(
-        "http://192.168.1.8:5000/track/api/lastPosArr",
+        "http://3.83.109.19:5000/track/api/lastPosArr",
         req
       );
       const curPosArr = await res.json();
