@@ -8,7 +8,6 @@ const { Customer, Car, Record } = models;
  * @route Get all the of all docs/users from db
  */
 router.get("/", (req, res) => {
-  console.log("Request made to /");
   Customer.find()
     .then(doc => res.json(doc))
     .catch(err => console.log(err));
@@ -19,7 +18,6 @@ router.get("/", (req, res) => {
  * @params email, plate
  */
 router.post("/lastPos", (req, res) => {
-  console.log("Request made to /lastPos");
   const { email, plate } = req.body;
   const query = { email: email };
   let status = false;
@@ -43,9 +41,7 @@ router.post("/lastPos", (req, res) => {
  * @params email, plate
  */
 router.post("/getRecords", (req, res) => {
-  console.log("Request made to /getAll");
   const { email, plate } = req.body;
-  console.log(email);
   const query = { email: email };
   let status = false;
   Customer.findOne(query)
@@ -64,11 +60,28 @@ router.post("/getRecords", (req, res) => {
 });
 
 /**
+ * @route Get all records of a bunch of cars
+ * @params email, plate
+ */
+router.post("/getAllRecords", (req, res) => {
+  const { email } = req.body;
+  const query = { email: email };
+  Customer.findOne(query)
+    .then(doc => {
+      let recordsArr = [];
+      doc.cars.forEach(car => {
+        recordsArr = [...recordsArr, car.records];
+      });
+      res.json(recordsArr);
+    })
+    .catch(err => console.log(err));
+});
+
+/**
  * @route Add one record to records vector
- * @params email, plate, lat, lon, rpm 
+ * @params email, plate, lat, lon, rpm
  */
 router.post("/rec", (req, res) => {
-  console.log("Request made to /rec");
   const { email, plate, lat, lon, rpm } = req.body;
   var pos = new Record({
     latitud: lat,
@@ -93,7 +106,6 @@ router.post("/rec", (req, res) => {
  * @params email
  */
 router.post("/getUser", (req, res) => {
-  console.log("Request made to /getUser");
   const { email } = req.body;
   const query = { email: email };
   Customer.findOne(query)
@@ -108,7 +120,6 @@ router.post("/getUser", (req, res) => {
  * @params email, plates
  */
 router.post("/lastPosArr", (req, res) => {
-  console.log("Request made to /lastPosArr");
   const { email, plates } = req.body;
   const query = { email: email };
   Customer.findOne(query)

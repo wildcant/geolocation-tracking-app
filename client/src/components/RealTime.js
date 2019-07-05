@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import NavBar from "./navegation/NavBar";
 import RealMap from "./real/RealMap";
 import CheckCars from "./real/CheckCars";
-import { Grid, Container, Segment } from "semantic-ui-react";
+import { Grid, Segment } from "semantic-ui-react";
 const styles = {
   text: {
     color: "white"
@@ -23,18 +23,20 @@ export default class RealTime extends Component {
       cars: [],
       plates: [],
       records: [],
-      userLoaded: false
+      userLoaded: false,
+      mapLoaded: false
     };
   }
   async componentDidMount() {
     await this.getUser();
-    setInterval(async () => {
-      await this.getRecords();
-    }, 2000);
-    // await this.getLastPosition();
-    // await this.getRecords();
+    await this.getRecords();
   }
-
+  componentDidUpdate() {
+    if (this.state.mapLoaded) {
+      console.log("update after map loaded");
+      setTimeout(async () => await this.getRecords(), 2000);
+    }
+  }
   getUser = async () => {
     const reqBody = { email: "will.canti2697@gmail.com" };
     const req = {
@@ -62,17 +64,9 @@ export default class RealTime extends Component {
   };
   handleChangeCheckCar = (ind, e) => {
     let cars = this.state.cars;
-    let plates = [];
     cars[ind].active = !cars[ind].active;
-    cars.forEach(car => {
-      if (car.active) {
-        plates = [...plates, car.plate];
-      }
-    });
-
-    console.table(plates);
     // console.table(cars);
-    this.setState({ cars, plates });
+    this.setState({ cars });
   };
 
   getRecords = async () => {
@@ -89,15 +83,13 @@ export default class RealTime extends Component {
         req
       );
       const curPosArr = await res.json();
-      console.log(curPosArr);
       curPosArr.map((curPos, i) => {
         cars[i].records = [
           ...cars[i].records,
           { lat: curPos.latitud, lng: curPos.longitud }
         ];
       });
-      console.log(cars);
-      this.setState({ cars, loaded:true });
+      this.setState({ cars, mapLoaded: true });
     } catch (error) {
       this.setState({ mess: "Was not able to connect to the dataBase" });
       console.log(error.message);
@@ -105,8 +97,8 @@ export default class RealTime extends Component {
   };
 
   render() {
-    const {  loaded, mess, cars, plates, userLoaded } = this.state;
-    console.log(this.state.plates);
+    console.log("render");
+    const { mapLoaded, mess, cars, userLoaded } = this.state;
     return (
       <div>
         <NavBar />
@@ -124,7 +116,7 @@ export default class RealTime extends Component {
             </Segment>
           </Grid.Column>
           <Grid.Column width={12}>
-            {loaded ? (
+            {mapLoaded ? (
               <Segment color="black" inverted style={styles.mapContainer}>
                 <RealMap cars={cars} />
               </Segment>

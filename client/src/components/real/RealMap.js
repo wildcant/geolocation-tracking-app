@@ -1,39 +1,50 @@
-import React from "react";
-import { Map, GoogleApiWrapper, Marker, Polyline } from "google-maps-react";
-const styles = {
-  mapStyles: {
-    width: "100%",
-    height: "100%"
+import React, { Component } from "react";
+import Map from "../common/Map";
+
+class App extends Component {
+  componentDidUpdate() {
+    const { cars } = this.props;
+    console.log(cars[0], cars[1]);
+    cars.map((car, id) => {
+      this.markers[id].setPosition(car.records[car.records.length - 1]);
+      this.polys[id].setPath(car.records);
+      if (!car.active) {
+        this.markers[id].setVisible(false);
+        this.polys[id].setVisible(false);
+      } else {
+        this.markers[id].setVisible(true);
+        this.polys[id].setVisible(true);
+      }
+    });
   }
-};
-const RealMap = props => {
-  const { google, cars, mapLoaded } = props;
 
-  const polys = cars.map((car, id) => {
-    if (car.active) {
-      return <Polyline key={id} path={car.records} />;
-    }
-  });
-  const markers = cars.map((car, id) => {
-    if (car.active) {
-      return <Marker key={id} position={car.records[car.records.length - 1]} />;
-    }
-  });
-  console.log(markers);
+  render() {
+    const { cars } = this.props;
+    let lastPos = cars[1].records[cars[1].records.length - 1];
+    return (
+      <Map
+        id="myMap"
+        options={{
+          center: lastPos,
+          zoom: 15
+        }}
+        onMapLoad={map => {
+          this.markers = cars.map(car => {
+            return new window.google.maps.Marker({
+              position: car.records[car.records.length - 1],
+              map: map
+            });
+          });
+          this.polys = cars.map(car => {
+            return new window.google.maps.Polyline({
+              path: car.records,
+              map: map
+            });
+          });
+        }}
+      />
+    );
+  }
+}
 
-  return (
-    <Map
-      google={google}
-      zoom={15}
-      style={styles.mapStyles}
-      initialCenter={{ lat: 11.196652155048742, lng: -74.22753810882568 }}
-    >
-      {markers}
-      {polys}
-    </Map>
-  );
-};
-
-export default GoogleApiWrapper({
-  apiKey: "AIzaSyDqV0nn953l7QAY_1GKVKcQO6Md2YW2W1o"
-})(RealMap);
+export default App;

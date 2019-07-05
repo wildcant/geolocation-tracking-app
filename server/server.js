@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+var morgan = require("morgan");
 const bodyParser = require("body-parser");
 const records = require("./routes/records");
 // connect to db
@@ -16,6 +17,7 @@ mongoose
 // Express app
 const app = express();
 app.use(cors());
+app.use(morgan("combined"));
 app.use(bodyParser.json());
 app.use("/track/api", records);
 
