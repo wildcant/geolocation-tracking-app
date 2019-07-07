@@ -11,6 +11,10 @@ const styles = {
     height: "500px",
     padding: "0",
     margin: "0"
+  },
+  btn: {
+    fontSize: "20px",
+    marginBottom: "22px"
   }
 };
 
@@ -24,8 +28,11 @@ export default class RealTime extends Component {
       plates: [],
       records: [],
       userLoaded: false,
-      mapLoaded: false
+      mapLoaded: false,
+      fitBounds: true,
+      controlBoundMess: "Following"
     };
+    this.btn = React.createRef();
   }
   async componentDidMount() {
     await this.getUser();
@@ -96,9 +103,22 @@ export default class RealTime extends Component {
     }
   };
 
+  handleBounds = () => {
+    let { fitBounds, controlBoundMess } = this.state;
+    fitBounds = !fitBounds;
+    if (fitBounds) {
+      controlBoundMess = "Following";
+    } else {
+      controlBoundMess = "Not follow";
+    }
+    this.setState({
+      fitBounds,
+      controlBoundMess
+    });
+  };
   render() {
     console.log("render");
-    const { mapLoaded, mess, cars, userLoaded } = this.state;
+    const { mapLoaded, mess, cars, userLoaded, fitBounds, controlBoundMess } = this.state;
     return (
       <div>
         <NavBar />
@@ -118,7 +138,14 @@ export default class RealTime extends Component {
           <Grid.Column width={12}>
             {mapLoaded ? (
               <Segment color="black" inverted style={styles.mapContainer}>
-                <RealMap cars={cars} />
+                <button
+                  style={styles.btn}
+                  ref={this.btn}
+                  onClick={this.handleBounds}
+                >
+                  {controlBoundMess}
+                </button>
+                <RealMap cars={cars} btnBounds={this.btn} bounds={fitBounds} />
               </Segment>
             ) : (
               <div style={styles.text}>{mess}</div>
