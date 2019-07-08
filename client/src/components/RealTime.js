@@ -2,7 +2,19 @@ import React, { Component } from "react";
 import NavBar from "./navegation/NavBar";
 import RealMap from "./real/RealMap";
 import CheckCars from "./real/CheckCars";
-import { Grid, Segment } from "semantic-ui-react";
+import CarData from "./real/CarData";
+import ChooseBar from "./real/ChooseBar";
+import {
+  Grid,
+  Segment,
+  Button,
+  Icon,
+  Image,
+  Menu,
+  Sidebar,
+  Loader,
+  Dimmer
+} from "semantic-ui-react";
 const styles = {
   text: {
     color: "white"
@@ -12,10 +24,16 @@ const styles = {
     padding: "0",
     margin: "0"
   },
+  sidebar: {
+    height: "450px",
+    backgroundColor: "#121212",
+    padding: "0",
+    margin: "0"
+  },
   btn: {
     fontSize: "20px",
     marginBottom: "22px"
-  }
+  },
 };
 
 export default class RealTime extends Component {
@@ -30,10 +48,24 @@ export default class RealTime extends Component {
       userLoaded: false,
       mapLoaded: false,
       fitBounds: true,
-      controlBoundMess: "Following"
+      controlBoundMess: "Following",
+      visible: false,
+      chooseCarMess: "Choose cars to show"
     };
     this.btn = React.createRef();
   }
+
+  toggleSideBar = () => {
+    let { visible, chooseCarMess } = this.state;
+    visible = !visible;
+    if (visible) {
+      chooseCarMess = "Hide";
+    } else {
+      chooseCarMess = "Choose cars to show";
+    }
+    this.setState({ visible, chooseCarMess });
+  };
+
   async componentDidMount() {
     await this.getUser();
     await this.getRecords();
@@ -90,12 +122,24 @@ export default class RealTime extends Component {
         req
       );
       const curPosArr = await res.json();
-      curPosArr.map((curPos, i) => {
+      curPosArr.map(async (curPos, i) => {
+        const addressRes = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?&latlng=${
+            curPos.latitud
+          },${curPos.longitud}&key=AIzaSyDqV0nn953l7QAY_1GKVKcQO6Md2YW2W1o`
+        );
+        const address = await addressRes.json();
+        if (address.results[2]) {
+          cars[i].address = address.results[2].formatted_address;
+        } else {
+          cars[i].address = "not found";
+        }
         cars[i].records = [
           ...cars[i].records,
           { lat: curPos.latitud, lng: curPos.longitud }
         ];
       });
+
       this.setState({ cars, mapLoaded: true });
     } catch (error) {
       this.setState({ mess: "Was not able to connect to the dataBase" });
@@ -107,9 +151,9 @@ export default class RealTime extends Component {
     let { fitBounds, controlBoundMess } = this.state;
     fitBounds = !fitBounds;
     if (fitBounds) {
-      controlBoundMess = "Following";
+      controlBoundMess = "Don't follow";
     } else {
-      controlBoundMess = "Not follow";
+      controlBoundMess = "Follow";
     }
     this.setState({
       fitBounds,
@@ -118,22 +162,66 @@ export default class RealTime extends Component {
   };
   render() {
     console.log("render");
-    const { mapLoaded, mess, cars, userLoaded, fitBounds, controlBoundMess } = this.state;
+    const {
+      mapLoaded,
+      cars,
+      userLoaded,
+      fitBounds,
+      controlBoundMess,
+      visible,
+      chooseCarMess
+    } = this.state;
+    console.log(visible);
     return (
       <div>
         <NavBar />
         <Grid stackable columns={2} divided padded inverted>
           <Grid.Column width={4}>
-            <Segment color="black" inverted>
-              {userLoaded ? (
-                <CheckCars
-                  cars={cars}
-                  handleChange={this.handleChangeCheckCar}
-                />
-              ) : (
-                <div>Loading</div>
-              )}
-            </Segment>
+            {userLoaded ? (
+              <Segment inverted style={styles.sidebar}>
+                <Button
+                  inverted
+                  color="blue"
+                  fluid
+                  compact
+                  active={visible}
+                  onClick={this.toggleSideBar}
+                >
+                  {chooseCarMess}
+                </Button>
+                <Sidebar.Pushable
+                  style={{ backgroundColor: "rgb(1,1,1,0.9)" }}
+                  as={Segment}
+                >
+                  <Sidebar
+                    style={{ width: "100%" }}
+                    as={Menu}
+                    animation="overlay"
+                    icon="labeled"
+                    inverted
+                    onHide={this.handleSidebarHide}
+                    vertical
+                    visible={visible}
+                    width="thin"
+                  >
+                    <CheckCars
+                      cars={cars}
+                      handleChange={this.handleChangeCheckCar}
+                    />
+                  </Sidebar>
+
+                  <CarData cars={cars} />
+                </Sidebar.Pushable>
+                <Sidebar.Pusher dimmed={visible} />
+              </Segment>
+            ) : (
+              <Segment>
+                <Dimmer active>
+                  <Loader />
+                </Dimmer>
+                <Segment style={styles.sidebar} />
+              </Segment>
+            )}
           </Grid.Column>
           <Grid.Column width={12}>
             {mapLoaded ? (
@@ -148,7 +236,12 @@ export default class RealTime extends Component {
                 <RealMap cars={cars} btnBounds={this.btn} bounds={fitBounds} />
               </Segment>
             ) : (
-              <div style={styles.text}>{mess}</div>
+              <Segment>
+                <Dimmer active>
+                  <Loader />
+                </Dimmer>
+                <Segment style={styles.mapContainer} />
+              </Segment>
             )}
           </Grid.Column>
         </Grid>

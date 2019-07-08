@@ -1,46 +1,25 @@
-import React from "react";
-
-
-const styles = {
-  btn: {
-    fontSize: "20px",
-    marginBottom: '22px',
-    opacity: 0,
-  }
-}
-export default class Map extends React.Component {
-  constructor(props){
-    super(props);
-    this.btn = React.createRef();
-  }
+import React, { Component } from "react";
+import './Test.css';
+export default class Test extends Component {
   componentDidMount() {
-    this.map = new window.google.maps.Map(document.getElementById("map"), {
-      center: { lat: 41.0082, lng: 28.9784 },
-      zoom: 8
+    var map = new window.google.maps.Map(document.getElementById("map"), {
+      center: { lat: 11.195199752631972, lng: -74.2275268554688 },
+      zoom: 13
     });
-    this.map.controls[window.google.maps.ControlPosition.BOTTOM_LEFT].push(this.btn.current);
-    this.btn.current.style.opacity = 1;
+    var marker = new window.google.maps.Marker({
+      position: { lat: 11.195199752631972, lng: -74.22775268554688 },
+      clickable: true,
+      map:  map
+    });
+    let contentString = '<b>Hello Wolrd!</b>';
+    let infowindow = new window.google.maps.InfoWindow({
+      content: contentString
+    })
+    marker.addListener("dbclick", function() {
+      infowindow.open(map, marker);
+    });
   }
-  componentDidUpdate() {
-    var NEW_ZEALAND_BOUNDS = {
-      north: -34.36,
-      south: -47.35,
-      west: 166.28,
-      east: -175.81
-    };
-    this.map.fitBounds(NEW_ZEALAND_BOUNDS);
-    console.log(this.map);
-  }
-  handle = () => {
-    this.setState({});
-  };
   render() {
-    console.log("render");
-    return (
-      <div>
-        <div style={{ width: 500, height: 500 }} id="map" />
-        <button style={styles.btn} ref={this.btn} onClick={this.handle}>click</button>
-      </div>
-    );
+    return <div style={{ width: "100%", height: "500px" }} id={"map"} />;
   }
 }
