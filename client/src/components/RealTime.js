@@ -33,7 +33,7 @@ const styles = {
   btn: {
     fontSize: "20px",
     marginBottom: "22px"
-  },
+  }
 };
 
 export default class RealTime extends Component {
@@ -69,13 +69,20 @@ export default class RealTime extends Component {
   async componentDidMount() {
     await this.getUser();
     await this.getRecords();
+    if (this.state.mapLoaded) {
+      setInterval(async () => {
+        await this.getRecords();
+      }, 2000);
+    }
   }
+  /*
   componentDidUpdate() {
     if (this.state.mapLoaded) {
       console.log("update after map loaded");
-      setTimeout(async () => await this.getRecords(), 2000);
+      setTimeout(async () => await this.getRecords(), 10000);
     }
   }
+  */
   getUser = async () => {
     const reqBody = { email: "will.canti2697@gmail.com" };
     const req = {
@@ -171,7 +178,6 @@ export default class RealTime extends Component {
       visible,
       chooseCarMess
     } = this.state;
-    console.log(visible);
     return (
       <div>
         <NavBar />
